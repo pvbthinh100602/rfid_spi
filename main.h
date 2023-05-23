@@ -11,10 +11,10 @@
 //#include "i2c/i2c.h"
 
 #pragma config OSC		= HS
-#pragma config FCMEN            = OFF
+#pragma config FCMEN    = OFF
 #pragma config IESO		= OFF
 #pragma config PWRT		= OFF
-#pragma config BOREN            = ON
+#pragma config BOREN    = ON
 #pragma config BORV		= 0
 #pragma config WDT		= OFF
 #pragma config MCLRE            = ON

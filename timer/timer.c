@@ -131,7 +131,6 @@ void stop_timer3(void)
 //Cac ham phuc vu interupt timer
 void timer0_isr(void)
 {
-	if(time0_MUL == 0) return;
     timer0_cnt ++;
 	if (timer0_cnt >= time0_MUL)
 	{

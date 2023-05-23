@@ -9,8 +9,9 @@
 #define	_RC522_H_
 
 #include <p18f4620.h>
+#include <stdio.h>
 
-#include "spi.h"
+#include "spi/spi.h"
 #include "uart/uart.h"
 #include "timer/timer.h"
 #include "interrupt/interrupt.h"
@@ -81,74 +82,59 @@
    the MFRC522 Manufacturer's Datasheet (Rev. 3.6 ? 14 December 2011), Table 20
 */
 //Page 0: Command and Status
-#define     Reserved00          0x00  // reserved for future use
-#define     CommandReg          0x01  // starts and stops command execution
-#define     ComIEnReg           0x02  // enable and disable the passing of interrupt requests to IRq pin
-#define     DivlEnReg           0x03  // enable and disable interrupt request control bits
-#define     ComIrqReg           0x04  // interrupt request bits
-#define     DivIrqReg           0x05  // interrupt request bits
-#define     ErrorReg            0x06  // error bits showing the error status of the last command executed
-#define     Status1Reg          0x07  // communication status bits
-#define     Status2Reg          0x08  // receiver and transmitter status bits
-#define     FIFODataReg         0x09  // input and output of 64 byte FIFO buffer
-#define     FIFOLevelReg        0x0A  // number of bytes stored in the FIFO buffer
-#define     WaterLevelReg       0x0B  // level for FIFO underflow and overflow warning
-#define     ControlReg          0x0C  // miscellaneous control registers
-#define     BitFramingReg       0x0D  // adjustments for bit-oriented frames
-#define     CollReg             0x0E  // bit position of the first bit-collision detected on the RF interface
-#define     Reserved01          0x0F  // reserved for future use
+#define     CommandReg          0x01 << 1  // starts and stops command execution
+#define     ComIEnReg           0x02 << 1  // enable and disable the passing of interrupt requests to IRq pin
+#define     DivlEnReg           0x03 << 1  // enable and disable interrupt request control bits
+#define     ComIrqReg           0x04 << 1  // interrupt request bits
+#define     DivIrqReg           0x05 << 1  // interrupt request bits
+#define     ErrorReg            0x06 << 1  // error bits showing the error status of the last command executed
+#define     Status1Reg          0x07 << 1  // communication status bits
+#define     Status2Reg          0x08 << 1  // receiver and transmitter status bits
+#define     FIFODataReg         0x09 << 1  // input and output of 64 byte FIFO buffer
+#define     FIFOLevelReg        0x0A << 1  // number of bytes stored in the FIFO buffer
+#define     WaterLevelReg       0x0B << 1  // level for FIFO underflow and overflow warning
+#define     ControlReg          0x0C << 1  // miscellaneous control registers
+#define     BitFramingReg       0x0D << 1  // adjustments for bit-oriented frames
+#define     CollReg             0x0E << 1  // bit position of the first bit-collision detected on the RF interface
 //Page 1: Command     
-#define     Reserved10          0x10  // reserved for future use
-#define     ModeReg             0x11  // defines general modes for transmitting and receiving
-#define     TxModeReg           0x12  // defines transmission data rate and framing
-#define     RxModeReg           0x13  // defines reception data rate and framing
-#define     TxControlReg        0x14  // controls the logical behavior of the antenna driver pins TX1 and TX2
-#define     TxAutoReg           0x15  // controls the setting of the transmission modulation
-#define     TxSelReg            0x16  // selects the internal sources for the antenna driver
-#define     RxSelReg            0x17  // selects internal receiver settings
-#define     RxThresholdReg      0x18  // selects thresholds for the bit decoder
-#define     DemodReg            0x19  // defines demodulator settings
-#define     Reserved11          0x1A  // reserved for future use
-#define     Reserved12          0x1B  // reserved for future use
-#define     MfTxReg             0x1C  // controls some MIFARE communication transmit parameters
-#define     MfRxReg             0x1D  // controls some MIFARE communication receive parameters
-#define     Reserved13          0x1E  // reserved for future use
-#define     SerialSpeedReg      0x1F  // selects the speed of the serial UART interface
+#define     ModeReg             0x11 << 1  // defines general modes for transmitting and receiving
+#define     TxModeReg           0x12 << 1  // defines transmission data rate and framing
+#define     RxModeReg           0x13 << 1  // defines reception data rate and framing
+#define     TxControlReg        0x14 << 1  // controls the logical behavior of the antenna driver pins TX1 and TX2
+#define     TxAutoReg           0x15 << 1  // controls the setting of the transmission modulation
+#define     TxSelReg            0x16 << 1  // selects the internal sources for the antenna driver
+#define     RxSelReg            0x17 << 1  // selects internal receiver settings
+#define     RxThresholdReg      0x18 << 1  // selects thresholds for the bit decoder
+#define     DemodReg            0x19 << 1 // defines demodulator settings
+#define     MfTxReg             0x1C << 1  // controls some MIFARE communication transmit parameters
+#define     MfRxReg             0x1D << 1  // controls some MIFARE communication receive parameters
+#define     SerialSpeedReg      0x1F << 1  // selects the speed of the serial UART interface
 //Page 2: Configuration  
-#define     Reserved20          0x20  // reserved for future use
-#define     CRCResultRegH       0x21  // shows the MSB values of the CRC calculation
-#define     CRCResultRegL       0x22  // shows the LSB values of the CRC calculation
-#define     Reserved21          0x23  // reserved for future use
-#define     ModWidthReg         0x24  // controls the ModWidth setting
-#define     Reserved22          0x25  // reserved for future use
-#define     RFCfgReg            0x26  // configures the receiver gain
-#define     GsNReg              0x27  // selects the conductance of the antenna driver pins TX1 and TX2 for modulation
-#define     CWGsPReg            0x28  // defines the conductance of the p-driver output during periods of no modulation
-#define     ModGsPReg           0x29  // defines the conductance of the p-driver output during periods of modulation
-#define     TModeReg            0x2A  // defines settings for the internal timer
-#define     TPrescalerReg       0x2B  // defines settings for the internal timer
-#define     TReloadRegH         0x2C  // defines the higher 8 bits of the 16-bit timer reload value
-#define     TReloadRegL         0x2D  // defines the lower 8 bits of the 16-bit timer reload value
-#define     TCounterValueRegH   0x2E  // shows the higher 8 bits of the 16-bit timer value
-#define     TCounterValueRegL   0x2F  // shows the lower 8 bits of the 16-bit timer value
+#define     CRCResultRegH       0x21 << 1  // shows the MSB values of the CRC calculation
+#define     CRCResultRegL       0x22 << 1  // shows the LSB values of the CRC calculation
+#define     ModWidthReg         0x24 << 1  // controls the ModWidth setting
+#define     RFCfgReg            0x26 << 1  // configures the receiver gain
+#define     GsNReg              0x27 << 1  // selects the conductance of the antenna driver pins TX1 and TX2 for modulation
+#define     CWGsPReg            0x28 << 1  // defines the conductance of the p-driver output during periods of no modulation
+#define     ModGsPReg           0x29 << 1  // defines the conductance of the p-driver output during periods of modulation
+#define     TModeReg            0x2A << 1  // defines settings for the internal timer
+#define     TPrescalerReg       0x2B << 1  // defines settings for the internal timer
+#define     TReloadRegH         0x2C << 1  // defines the higher 8 bits of the 16-bit timer reload value
+#define     TReloadRegL         0x2D << 1  // defines the lower 8 bits of the 16-bit timer reload value
+#define     TCounterValueRegH   0x2E << 1  // shows the higher 8 bits of the 16-bit timer value
+#define     TCounterValueRegL   0x2F << 1  // shows the lower 8 bits of the 16-bit timer value
 //Page 3: Test Registers    
-#define     Reserved30          0x30  // reserved for future use
-#define     TestSel1Reg         0x31  // general test signal configuration
-#define     TestSel2Reg         0x32  // general test signal configuration and PRBS control
-#define     TestPinEnReg        0x33  // enables pin output driver on pins D1 to D7
-#define     TestPinValueReg     0x34  // defines the values for D1 to D7 when it is used as an I/O bus
-#define     TestBusReg          0x35  // shows the status of the internal test bus
-#define     AutoTestReg         0x36  // controls the digital self test
-#define     VersionReg          0x37  // shows the software version
-#define     AnalogTestReg       0x38  // controls the pins AUX1 and AUX2
-#define     TestDAC1Reg         0x39  // defines the test value for TestDAC1
-#define     TestDAC2Reg         0x3A  // defines the test value for TestDAC2
-#define     TestADCReg          0x3B  // shows the value of ADC I and Q channels
-#define     Reserved31          0x3C  // reserved for production tests
-#define     Reserved32          0x3D  // reserved for production tests
-#define     Reserved33          0x3E  // reserved for production tests
-#define     Reserved34          0x3F  // reserved for production tests
-
+#define     TestSel1Reg         0x31 << 1  // general test signal configuration
+#define     TestSel2Reg         0x32 << 1  // general test signal configuration and PRBS control
+#define     TestPinEnReg        0x33 << 1  // enables pin output driver on pins D1 to D7
+#define     TestPinValueReg     0x34 << 1  // defines the values for D1 to D7 when it is used as an I/O bus
+#define     TestBusReg          0x35 << 1  // shows the status of the internal test bus
+#define     AutoTestReg         0x36 << 1  // controls the digital self test
+#define     VersionReg          0x37 << 1  // shows the software version
+#define     AnalogTestReg       0x38 << 1  // controls the pins AUX1 and AUX2
+#define     TestDAC1Reg         0x39 << 1  // defines the test value for TestDAC1
+#define     TestDAC2Reg         0x3A << 1  // defines the test value for TestDAC2
+#define     TestADCReg          0x3B << 1  // shows the value of ADC I and Q channels
 //PICC_TYPE
 #define		PICC_TYPE_UNKNOWN		0
 #define		PICC_TYPE_ISO_14443_4	1	// PICC compliant with ISO/IEC 14443-4 
@@ -162,6 +148,7 @@
 #define		PICC_TYPE_TNP3XXX		9	// Only mentioned in NXP AN 10833 MIFARE Type Identification Procedure
 #define		PICC_TYPE_NOT_COMPLETE	0xff	// SAK indicates UID is not complete.
 
+#define INT2HEX(hex, num) sprintf(hex,"%.2X", num)
 
 typedef struct {
 	unsigned char		size;			// Number of bytes in the UID. 4, 7 or 10.
@@ -175,42 +162,45 @@ typedef struct {
     unsigned char keyByte[6];
 } MIFARE_Key;
 
-//Uid uid;
-
-void init_RFID(void);
-void antennaOn(void);
-void antennaOff(void);
+void PCD_Write(unsigned char address, unsigned char data);
+unsigned char PCD_Read(unsigned char address);
+void PCD_Read_Array(unsigned char address, unsigned char count, unsigned char *values, unsigned char rxAlign);
+void PCD_Write_Array(unsigned char address, unsigned char count, unsigned char *values);
+unsigned char PCD_CalculateCRC(	unsigned char *data, unsigned char length, unsigned char *result);
 void setBitMask(unsigned char reg, unsigned char mask);
 void clearBitMask(unsigned char reg, unsigned char mask);
+void antennaOn(void);
+void antennaOff(void);
 void rfid_reset();
-unsigned char PICC_IsNewCardPresent();
-unsigned char PCD_TransceiveData(	unsigned char *sendData,		///< Pointer to the data to transfer to the FIFO.
-													unsigned char sendLen,		///< Number of bytes to transfer to the FIFO.
-													unsigned char *backData,		///< nullptr or pointer to buffer if data should be read back after executing the command.
-													unsigned char *backLen,		///< In: Max number of bytes to write to *backData. Out: The number of bytes returned.
-													unsigned char *validBits,	///< In/Out: The number of valid bits in the last byte. 0 for 8 valid bits. Default nullptr.
-													unsigned char rxAlign,		///< In: Defines the bit position in backData[0] for the first bit received. Default 0.
-													unsigned char checkCRC		///< In: True => The last two bytes of the response is assumed to be a CRC_A that must be validated.
-								 );
+void init_RFID(void);
+unsigned char PICC_RequestA( unsigned char *bufferATQA, unsigned char *bufferSize);
+unsigned char PICC_Wakeup( unsigned char *bufferATQA, unsigned char *bufferSize);
 unsigned char PICC_REQA_or_WUPA(unsigned char command ,unsigned char *reqMode, unsigned char *bufferSize);
-unsigned char PCD_CommunicateWithPICC(	unsigned char command,		///< The command to execute. One of the PCD_Command enums.
-														unsigned char waitIRq,		///< The bits in the ComIrqReg register that signals successful completion of the command.
-														unsigned char *sendData,		///< Pointer to the data to transfer to the FIFO.
-														unsigned char sendLen,		///< Number of bytes to transfer to the FIFO.
-														unsigned char *backData,		///< nullptr or pointer to buffer if data should be read back after executing the command.
-														unsigned char *backLen,		///< In: Max number of bytes to write to *backData. Out: The number of bytes returned.
-														unsigned char *validBits,	///< In/Out: The number of valid bits in the last byte. 0 for 8 valid bits.
-														unsigned char rxAlign,		///< In: Defines the bit position in backData[0] for the first bit received. Default 0.
-														unsigned char checkCRC		///< In: True => The last two bytes of the response is assumed to be a CRC_A that must be validated.
-									 );
-unsigned char PCD_CalculateCRC(	unsigned char *data,		///< In: Pointer to the data to transfer to the FIFO for CRC calculation.
-								unsigned char length,	///< In: The number of bytes to transfer.
-								unsigned char *result	///< Out: Pointer to result buffer. Result is written to result[0..1], low byte first.
-					 );
-unsigned char PICC_Select(Uid *uid,unsigned char validBits);
+unsigned char PCD_TransceiveData(   unsigned char *sendData,
+                                    unsigned char sendLen,
+                                    unsigned char *backData, unsigned char *backLen,
+									unsigned char *validBits,
+									unsigned char rxAlign,
+									unsigned char checkCRC
+								 );
+unsigned char PCD_CommunicateWithPICC(	unsigned char command,
+										unsigned char waitIRq,
+										unsigned char *sendData,
+										unsigned char sendLen,
+										unsigned char *backData,
+										unsigned char *backLen,
+										unsigned char *validBits,
+										unsigned char rxAlign,
+										unsigned char checkCRC
+									  );
+unsigned char PICC_Select(Uid *_uid, unsigned char validBits);
+void PCD_DumpVersionToSerial();
+void PICC_DumpToSerial(Uid *_uid);
+void PICC_DumpDetailsToSerial(Uid *_uid);
+const rom char* PICC_GetTypeName(unsigned char piccType);
 unsigned char PICC_GetType(unsigned char sak);
-unsigned char PICC_WakeupA(	unsigned char *bufferATQA,	///< The buffer to store the ATQA (Answer to request) in
-											unsigned char *bufferSize	///< Buffer size, at least two bytes. Also number of bytes returned if STATUS_OK.
-										);
+unsigned char PICC_HaltA();
+unsigned char PICC_IsNewCardPresent();
+unsigned char PICC_ReadCardSerial();
 #endif	/* RC522_H */
 
